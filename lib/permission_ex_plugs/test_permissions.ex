@@ -17,13 +17,13 @@ defmodule PermissionEx.Plugs.TestPermissions do
     defexception message: message, plug_status: 401
   end
 
-  import Plug.Conn
+  #import Plug.Conn
 
   @behaviour Plug
 
 
   def init(options) do
-    callback_module = case Keyword.get(options, :callback_module, nil) do
+    case Keyword.get(options, :callback_module, nil) do
       nil -> raise OptionsError, message: "Callback module is not defined", plug_status: 500
       callback_module -> callback_module
     end
@@ -33,9 +33,7 @@ defmodule PermissionEx.Plugs.TestPermissions do
   def call(conn, callback_module) do
     case try_callback(conn, callback_module) do
       true -> conn
-      false ->
-        conn
-        |>
+      false -> callback_failed(conn, callback_module)
     end
   end
 
