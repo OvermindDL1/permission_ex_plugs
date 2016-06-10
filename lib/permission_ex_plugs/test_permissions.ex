@@ -1,11 +1,12 @@
 defmodule PermissionEx.Plugs.TestPermissions do
   @moduledoc """
   This calls `test_conn_permissions/1` on the module that is passed in to the
-  options of this plug as `:callback_module`.
+  options of this plug as `:callback_module`, it should only return a tuple of:
+  `{true, conn}` or `{false, conn}`
 
   If the `test_conn_permissions/1` callback returns anything but true then this
   plug will call `test_conn_permissions_failed/1` with the `conn` on the
-  `:callback_module`.
+  `:callback_module`, should mutate and return the conn as necessary.
   """
 
   defmodule OptionsError do
@@ -32,8 +33,8 @@ defmodule PermissionEx.Plugs.TestPermissions do
 
   def call(conn, callback_module) do
     case try_callback(conn, callback_module) do
-      true -> conn
-      false -> callback_failed(conn, callback_module)
+      {true, newConn} -> newConn
+      {false, newConn} -> callback_failed(newConn, callback_module)
     end
   end
 
